@@ -5,8 +5,10 @@ def dl_jpg(url,file_path,file_name):
   full_path = file_path + file_name + '.jpg'
   urllib.request.urlretrieve(url,full_path)
 
-img = pd.read_csv('data/images.csv') 
-for i in range(328,len(img)):
+img = pd.read_csv('data/test.csv')
+img = img[['TweetId','images']]
+img = img[img['images']!=' '] 
+for i in range(len(img)):
     print(i)
     try:
         url = str(img['images'][i])
