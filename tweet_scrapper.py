@@ -1,28 +1,52 @@
 import tweepy
 import pandas as pd
 import time
+from pprint import pprint
+
 # Developer API keys
-consumer_key = 'FhnADHOEmH6rSIo6EtkX1Qrof'
-consumer_key_secret = 'kGDdelgKFASHrdVEzMrLR3oEznNDzExWz8nmFHr6zUosLASI3Q'
-access_token = '1206572403309965313-HHdJ0nT4LseoTJP0sWymx4xAELtQ5d'
-access_token_secret = 'eiQM3T1ryg7GQof1pJYn5naknB4ETlXWMHwDazaNKRNSZ'
+consumer_key = 'XXXX'
+consumer_key_secret = 'XXXX'
+access_token = 'XX-XX'
+access_token_secret = 'XXXX'
 
 auth = tweepy.OAuthHandler(consumer_key, consumer_key_secret)
 auth.set_access_token(access_token, access_token_secret)
 api = tweepy.API(auth)
 
-metoo_train = pd.read_csv("data/MeTooMMD_train.csv")
-tweet_id = list(metoo_train['TweetId'])
-tweets = []
+metoo = pd.read_csv('data/MeTooMMD_train.csv')
+tweet_id = list(metoo['TweetId'])
+tweet = []
+images = []
+retweet_count = []
+favorite_count = []
+date = []
+lang =[]
+i = 0
 for _id in tweet_id:
+    i+=1
     try:
         tweetFetched = api.get_status(_id)
-        print("Tweet fetched" + tweetFetched.text)
-        tweets.append(tweetFetched.text)
-        time.sleep(2)
-
+        tweet.append(tweetFetched.text)
+        images.append(tweetFetched.extended_entities['media'][0]['media_url_https'])
+        retweet_count.append(tweetFetched.retweet_count)
+        favorite_count.append(tweetFetched.favorite_count)
+        date.append(tweetFetched.created_at.strftime("%Y-%m-%d"))
+        lang.append(tweetFetched.lang)
+        
     except:
-        print("Inside the exception - no:2")
+        print("Exception: Tweet might be deleted")
+        retweet_count.append('')
+        favorite_count.append('')
+        date.append('')
+        lang.append('')
+        images.append('')
+        tweet.append('')
         continue
-metoo_train['tweet'] = tweets
-metoo_train.to_csv("data/train.csv")
+metoo['retweet_count'] = retweet_count
+metoo['date'] = date
+metoo['lang'] = lang
+metoo['tweet'] = tweet
+metoo['favorite_count'] = favorite_count
+metoo['images'] = images
+
+metoo.to_csv('train.csv')
